@@ -28,7 +28,7 @@ export class UsersService {
     const fileName = `${uuid.v4()}${extname(createUserDto.avatarUrl)}`;
     const filePath = this.fileService.getFilePath(fileName);
     await this.fileService.downloadFile(createUserDto.avatarUrl, filePath);
-    const base64Avatar = this.fileService.toBase64(filePath);
+    const base64Avatar = await this.fileService.toBase64(filePath);
 
     const user = await this.usersRepository.create({
       ...createUserDto,
@@ -85,8 +85,8 @@ export class UsersService {
       throw new NotFoundException('User with given id was not found');
     }
 
-    const filePath = await this.fileService.getFilePath(user.fileName);
-    this.fileService.deleteFile(filePath);
+    const filePath = this.fileService.getFilePath(user.fileName);
+    await this.fileService.deleteFile(filePath);
 
     return user;
   }
