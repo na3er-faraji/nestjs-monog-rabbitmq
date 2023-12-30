@@ -1,29 +1,25 @@
-import Axios from 'axios';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { extname, join } from 'path';
 
+@Injectable()
 export class FileService {
+  constructor(private readonly httpService: HttpService) {}
+
   async downloadFile(fileUrl: string, filePath: string): Promise<boolean> {
     const writer = fs.createWriteStream(filePath);
-    return Axios({
-      method: 'get',
+    const response = await this.httpService.axiosRef({
       url: fileUrl,
+      method: 'GET',
       responseType: 'stream',
-    }).then((response) => {
-      return new Promise((resolve, reject) => {
-        response.data.pipe(writer);
-        let error = null;
-        writer.on('error', (err) => {
-          error = err;
-          writer.close();
-          reject(err);
-        });
-        writer.on('close', () => {
-          if (!error) {
-            resolve(true);
-          }
-        });
-      });
+    });
+
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
     });
   }
 

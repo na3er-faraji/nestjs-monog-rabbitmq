@@ -7,6 +7,7 @@ import { UserDocument, UserSchema } from './model/users.schema';
 import { FileService } from '../common/file.service';
 import { NotificationsModule } from 'src/notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { FileModule } from 'src/common/file.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ]),
     EventEmitterModule.forRoot(),
     NotificationsModule,
+    FileModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, FileService],
